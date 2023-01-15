@@ -69,7 +69,7 @@ function App() {
   }, [message])
 
   return (
-    <div className="App w-full overflow-x-hidden bg-blue-100 min-h-screen">
+    <div className="App w-full overflow-x-hidden overflow-y-hidden bg-blue-100 min-h-screen">
       {
         message ?
         <div class="bg-green-100 rounded-lg py-5 px-6 mb-4 text-base text-green-700 mb-3 w-72 fixed top-0 right-0" role="alert">
