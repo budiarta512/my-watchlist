@@ -12,6 +12,9 @@ function App() {
   const [searchedMovie, setSearchedMovie] = useState([])
   const [watchlist, setWatchlist] = useState([{}])
   const [message, setMessage] = useState('')
+  const [openModal, setOpenModal] = useState(false)
+  const [detailMovie, setDetailMovie] = useState({})
+  const [genre, setGenre] = useState([])
 
   useEffect(()=> {
     axios.get('https://api.themoviedb.org/3/movie/popular?api_key=b646207c15064772c9d07a52c078afe8')
@@ -20,6 +23,12 @@ function App() {
     }).catch(err => {
       console.log(err)
     })
+    axios.get('https://api.themoviedb.org/3/genre/movie/list?api_key=b646207c15064772c9d07a52c078afe8')
+      .then(res => {
+        setGenre(res.data.genres)
+      }).catch(err => {
+        console.log(err)
+      })
   }, [])
 
   useEffect(()=> {
@@ -62,6 +71,11 @@ function App() {
     })
   }
 
+  const lihatMovie = (args) => {
+    setOpenModal(!openModal)
+    setDetailMovie(args)
+  }
+
   useEffect(()=> {
     setTimeout(()=> {
       setMessage('')
@@ -84,7 +98,7 @@ function App() {
           {
             movie.map(val => {
               return (
-                <CardMovie id={val.id} title={val.original_title} desc={val.overview} img={val.poster_path} clickHandle={tambahMovieHandle} />
+                <CardMovie data={val} clickHandle={tambahMovieHandle} addMovie={true} detailMovie={true} detailHandle={lihatMovie} />
               )
             })
           }
@@ -104,7 +118,7 @@ function App() {
               {
                 searchedMovie.map(val => {
                   return (
-                    <CardMovie id={val.id} title={val.original_title} desc={val.overview} img={val.poster_path} data={val} clickHandle={tambahMovieHandle} />
+                    <CardMovie data={val} clickHandle={tambahMovieHandle} addMovie={true} detailMovie={true} detailHandle={lihatMovie} />
                   )
                 })
               }
@@ -121,7 +135,7 @@ function App() {
                 watchlist.map(val => {
                   return (
                     val.title ?
-                    <CardMovie id={val.id} title={val.title} desc={val.desc} img={val.img} deleteHandle={deleteHandle} /> :
+                    <CardMovie data={val} deleteHandle={deleteHandle} detailMovie={true} detailHandle={lihatMovie} /> :
                     ''
                   )
                 }) :
@@ -129,6 +143,63 @@ function App() {
               }
             </div>
           </div>
+      </div>
+
+      {/* modal */}
+      <div
+        className={`relative z-40 ${openModal ? "block" : "hidden"}`}
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+        <div className="fixed inset-0 z-10 overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 w-full  sm:w-full sm:max-w-3xl">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div className="flex justify-between w-full mb-2">
+                <span className="text-sm font-bold text-gray-700">
+                  Detail Movie
+                </span>
+                <button
+                  type="button"
+                  onClick={()=> setOpenModal(!openModal)}
+                >
+                  <i className="bi bi-x text-lg"></i>
+                </button>
+              </div>
+              <hr />
+              <br />
+              {
+                detailMovie ?
+                <div className="flex gap-4 sm:flex-row flex-col">
+                <div className="">
+                  <img className="rounded-t-lg h-72" src={'http://image.tmdb.org/t/p/w500/' + detailMovie.poster_path} alt="" />
+                </div>
+                <div className="w-[70%]">
+                  <h3 className='text-xl font-semibold'>{detailMovie.original_title}</h3>
+                  <p className='mb-3'>{detailMovie.overview}</p>
+                  <p className='font-medium'>Tanggal Rilis : {detailMovie.release_date}</p>
+                  <p className='font-medium mb-3'>Popularity : {detailMovie.popularity}</p>
+                  <p> Genres : {
+                    detailMovie && detailMovie.genre_ids ?
+                    genre.map(val => {
+                      return (
+                        val.id === detailMovie.genre_ids[0] || val.id === detailMovie.genre_ids[1] || val.id === detailMovie.genre_ids[2] ?
+                        <span>{val.name}, </span> :
+                        ''
+                      )
+                    }) :
+                    ''
+                  }</p>
+                </div>
+              </div> :
+              ''
+              }
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
