@@ -62,13 +62,15 @@ function App() {
   }
 
   const deleteHandle = (args) => {
-    setWatchlist(prev => {
-      return watchlist.filter((val) => {
-        if(val.id !== args) {
-          return val
-        }
+    if(window.confirm('Hapus ?')) {
+      setWatchlist(prev => {
+        return watchlist.filter((val) => {
+          if(val.id !== args) {
+            return val
+          }
+        })
       })
-    })
+    }
   }
 
   const lihatMovie = (args) => {
@@ -173,10 +175,10 @@ function App() {
               {
                 detailMovie ?
                 <div className="flex gap-4 sm:flex-row flex-col">
-                <div className="">
+                <div className="flex justify-center">
                   <img className="rounded-t-lg h-72" src={'http://image.tmdb.org/t/p/w500/' + detailMovie.poster_path} alt="" />
                 </div>
-                <div className="w-[70%]">
+                <div className="sm:w-[70%] w-full">
                   <h3 className='text-xl font-semibold'>{detailMovie.original_title}</h3>
                   <p className='mb-3'>{detailMovie.overview}</p>
                   <p className='font-medium'>Tanggal Rilis : {detailMovie.release_date}</p>
